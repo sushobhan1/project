@@ -1,0 +1,106 @@
+from cProfile import label
+import pickle
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+from sklearn.metrics import silhouette_score
+# load data
+df = pd.read_csv(r"C:\Users\Lenovo\Desktop\Project\data.csv")
+pd.options.display
+df.head()
+df.shape
+#cdf = df['kathmandu.1','lalitpur.1','bhaktapur.1']
+df1 = df.iloc[1:, 2:]
+df1.head()
+
+scaler = StandardScaler()
+X = scaler.fit_transform(df1)
+X
+Kmeans = KMeans(n_clusters=2, n_init=20, random_state=0).fit(X)
+labels = Kmeans.predict(X)
+labels
+
+np.unique(labels, return_counts=True)
+df1['cluster'] = labels
+df1.groupby('cluster').mean()
+k_range = (2, 11)
+sil_score = []
+twss = []
+for k in k_range:
+    cluster = KMeans(n_clusters=k, n_init=10, random_state=42)
+    cluster.fit(X)
+    label = cluster.predict(X)
+    ss = silhouette_score(X, label)
+    sil_score.append(ss)
+    twss.append(cluster.inertia_)
+    
+
+
+plt.plot(k_range, twss, "ro-")
+plt.ylabel("twss")
+plt.xlabel("number of clusters")
+plt.plot(k_range, sil_score, "ro-")
+plt.ylabel("silhouette score")
+plt.xlabel("number of clusters")
+T = PCA(n_components=2).fit_transform(X)
+df2 = pd.DataFrame(T, columns=['PC1', 'PC2'])
+plt.figure(figsize=(7, 5))
+plt.scatter(df2.PC1, df2.PC2)
+
+Kmeans=KMeans(n_clusters=4, n_init=20,random_state=0).fit(X)
+labels=Kmeans.predict(X)
+labels
+df2['cluster']=labels
+plt.figure(figsize=(10,10))
+plt.scatter(df2.PC1,df2.PC2,c=df2['cluster'],s=50,cmap='rainbow')
+df1['cluster']=labels
+df1.groupby('cluster').mean()
+
+pickle.dump(X, open('model.pkl', 'wb'))
+
+
+
+
+
+'''
+This is a simple linear regression model to predit the CO2 emmission from cars
+Dataset:
+FuelConsumption.csv, which contains model-specific fuel consumption ratings and estimated carbon dioxide emissions
+for new light-duty vehicles for retail sale in Canada
+'''
+
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+import pickle
+
+df = pd.read_csv(r"C:\Users\Lenovo\Desktop\Project\data.csv")
+
+# take a look at the dataset
+#df.head()
+
+#use required features
+cdf = df[['Kathmandu.1','Lalitpur.1','Bhaktapur.1']]
+
+#Training Data and Predictor Variable
+# Use all data for training (tarin-test-split not used)
+x = cdf.iloc[:, :3]
+y = cdf.iloc[:, -1]
+
+
+regressor = LinearRegression()
+
+#Fitting model with trainig data
+regressor.fit(x, y)
+
+# Saving model to disk
+# Pickle serializes objects so they can be saved to a file, and loaded in a program again later on.
+pickle.dump(regressor, open('model.pkl','wb'))
+
+'''
+#Loading model to compare the results
+model = pickle.load(open('model.pkl','rb'))
+print(model.predict([[2.6, 8, 10.1]]))
+'''

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="login">
+        <h1>Analysis of Crime Rate</h1>
+        <h3> Enter the following values to analyze the rate of Crime</h3>
+
+        <!-- Main Input For Receiving Query to our ML -->
+        <form action="{{ url_for('predict')}}" method="post">
+            <div class="custom-select" style="width:200px;">
+                <select>
+                    <option value="0">Select city:</option>
+                    <option value="1">Kathmandu</option>
+                    <option value="2">lalitpur</option>
+
+                    <option value="3">Bhaktapur</option>
+
+                </select><br><br>
+            </div>
+            <div class="custom-select" style="width:300px;">
+                <select>
+                    <option value="0">Select year:</option>
+                    <option value="1">2069</option>
+                    <option value="2">2070</option>
+
+                    <option value="3">2071</option>
+
+                </select><br><br>
+            </div>
+
+            <input type="text" name="enginesize" placeholder="Engine Size" required="required" />
+            <input type="text" name="cylinders" placeholder="Cylinders" required="required" />
+            <input type="text" name="fuel" placeholder="Fuel" required="required" />
+
+
+            <button type="submit" class="btn">Analysis</button>
+        </form>
+
+        <br>
+        <br>
+        {{ prediction_text }}
+</body>
+
+</html>
